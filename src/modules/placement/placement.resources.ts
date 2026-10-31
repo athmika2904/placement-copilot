@@ -7,7 +7,7 @@ export class PlacementResources {
   @Resource({
     uri: 'placement://student/profile',
     name: 'Student Placement Profile',
-    description: 'Current academic credentials, technical skills, programming languages, and identified strengths/weaknesses',
+    description: 'Current academic credentials, technical skills, programming languages, and strengths/weaknesses',
     mimeType: 'application/json',
     examples: {
       response: {
@@ -35,7 +35,7 @@ export class PlacementResources {
   @Resource({
     uri: 'placement://companies',
     name: 'Recruitment Companies & Eligibility Criteria',
-    description: 'Directory of company recruitment profiles, eligibility thresholds (CGPA, branches, batches), and recruitment stages',
+    description: 'Complete catalog of company recruitment profiles, eligibility thresholds (Infosys, Google, Amazon, Microsoft, TCS), and selection rounds',
     mimeType: 'application/json',
     examples: {
       response: {
@@ -56,96 +56,6 @@ export class PlacementResources {
           disclaimer: 'Sample mock recruitment data for demonstration purposes.',
           companies
         }, null, 2)
-      }]
-    };
-  }
-
-  @Resource({
-    uri: 'placement://companies/infosys',
-    name: 'Infosys Recruitment Criteria & Rounds',
-    description: 'Detailed recruitment rounds, syllabus, and eligibility criteria for Infosys Specialist Programmer',
-    mimeType: 'application/json'
-  })
-  async getInfosysResource(uri: string, ctx: ExecutionContext) {
-    ctx.logger.info('Reading resource: placement://companies/infosys');
-    const criteria = this.store.getCompanyCriteria('infosys');
-    return {
-      contents: [{
-        uri,
-        mimeType: 'application/json',
-        text: JSON.stringify({ criteria }, null, 2)
-      }]
-    };
-  }
-
-  @Resource({
-    uri: 'placement://companies/google',
-    name: 'Google Recruitment Criteria & Rounds',
-    description: 'Detailed recruitment rounds, syllabus, and eligibility criteria for Google Early Career SWE',
-    mimeType: 'application/json'
-  })
-  async getGoogleResource(uri: string, ctx: ExecutionContext) {
-    ctx.logger.info('Reading resource: placement://companies/google');
-    const criteria = this.store.getCompanyCriteria('google');
-    return {
-      contents: [{
-        uri,
-        mimeType: 'application/json',
-        text: JSON.stringify({ criteria }, null, 2)
-      }]
-    };
-  }
-
-  @Resource({
-    uri: 'placement://companies/amazon',
-    name: 'Amazon Recruitment Criteria & Rounds',
-    description: 'Detailed recruitment rounds, syllabus, and eligibility criteria for Amazon SDE-1',
-    mimeType: 'application/json'
-  })
-  async getAmazonResource(uri: string, ctx: ExecutionContext) {
-    ctx.logger.info('Reading resource: placement://companies/amazon');
-    const criteria = this.store.getCompanyCriteria('amazon');
-    return {
-      contents: [{
-        uri,
-        mimeType: 'application/json',
-        text: JSON.stringify({ criteria }, null, 2)
-      }]
-    };
-  }
-
-  @Resource({
-    uri: 'placement://companies/microsoft',
-    name: 'Microsoft Recruitment Criteria & Rounds',
-    description: 'Detailed recruitment rounds, syllabus, and eligibility criteria for Microsoft SWE',
-    mimeType: 'application/json'
-  })
-  async getMicrosoftResource(uri: string, ctx: ExecutionContext) {
-    ctx.logger.info('Reading resource: placement://companies/microsoft');
-    const criteria = this.store.getCompanyCriteria('microsoft');
-    return {
-      contents: [{
-        uri,
-        mimeType: 'application/json',
-        text: JSON.stringify({ criteria }, null, 2)
-      }]
-    };
-  }
-
-  @Resource({
-    uri: 'placement://companies/tcs',
-    name: 'TCS Recruitment Criteria & Rounds',
-    description: 'Detailed recruitment rounds, syllabus, and eligibility criteria for TCS Digital/Prime',
-    mimeType: 'application/json'
-  })
-  async getTcsResource(uri: string, ctx: ExecutionContext) {
-    ctx.logger.info('Reading resource: placement://companies/tcs');
-    const criteria = this.store.getCompanyCriteria('tcs');
-    return {
-      contents: [{
-        uri,
-        mimeType: 'application/json',
-        text: JSON.stringify({ criteria }, null, 2)
       }]
     };
   }

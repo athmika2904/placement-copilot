@@ -132,13 +132,6 @@
         }
       ],
       "tags": ["planner", "study-schedule", "roadmap", "dsa"]
-    },
-    {
-      "uri": "/calculator-result",
-      "name": "Calculator Result",
-      "description": "Displays the result of a calculation with operation details",
-      "examples": [],
-      "tags": ["calculator"]
     }
   ],
   "generatedAt": "2026-10-31T00:00:00.000Z"
