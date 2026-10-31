@@ -5,6 +5,8 @@ import { DeadlineTools } from './tools/deadline.tools.js';
 import { EligibilityTools } from './tools/eligibility.tools.js';
 import { PreparationTools } from './tools/preparation.tools.js';
 import { AnalyticsTools } from './tools/analytics.tools.js';
+import { PlacementResources } from './placement.resources.js';
+import { PlacementPrompts } from './placement.prompts.js';
 
 @Module({
   name: 'placement',
@@ -15,7 +17,9 @@ import { AnalyticsTools } from './tools/analytics.tools.js';
     DeadlineTools,
     EligibilityTools,
     PreparationTools,
-    AnalyticsTools
+    AnalyticsTools,
+    PlacementResources,
+    PlacementPrompts
   ]
 })
 export class PlacementModule {}
