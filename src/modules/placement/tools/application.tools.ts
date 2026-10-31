@@ -1,7 +1,8 @@
+
 import { ToolDecorator as Tool, Widget, ExecutionContext, z } from '@nitrostack/core';
 import { PlacementStore } from '../../../data/store.js';
 import { RecruitmentStage, EligibilityStatus } from '../../../data/types.js';
-import { isValidStageTransition, VALID_RECRUITMENT_STAGES } from '../../../utils/validation.js';
+import { isValidStageTransition } from '../../../utils/validation.js';
 
 export class ApplicationTools {
   private store = PlacementStore.getInstance();
@@ -12,13 +13,13 @@ export class ApplicationTools {
     inputSchema: z.object({
       companyName: z.string().min(1).describe('Company name e.g. Google, Infosys, Amazon'),
       jobRole: z.string().min(1).describe('Job role e.g. Software Engineer, SDE Intern'),
-      stage: z.enum(['Interested', 'Applied', 'OA', 'Interview', 'Offer', 'Rejected']).optional().describe('Current recruitment stage (defaults to "Applied")'),
+      stage: z.enum(['Interested', 'Applied', 'OA', 'Interview', 'Offer', 'Rejected']).optional().describe('Current recruitment stage (defaults to Applied)'),
       applicationDate: z.string().optional().describe('Date of application (YYYY-MM-DD), defaults to today'),
       applicationDeadline: z.string().optional().describe('Application portal closing deadline (YYYY-MM-DD)'),
       oaDate: z.string().optional().describe('Scheduled online assessment date (YYYY-MM-DD)'),
       interviewDate: z.string().optional().describe('Scheduled interview date (YYYY-MM-DD)'),
       notes: z.string().optional().describe('Referral details, syllabus notes, preparation focus'),
-      eligibilityStatus: z.enum(['Eligible', 'Not eligible', 'Needs verification']).optional().describe('Initial eligibility status (defaults to "Eligible")')
+      eligibilityStatus: z.enum(['Eligible', 'Not eligible', 'Needs verification']).optional().describe('Initial eligibility status (defaults to Needs verification)')
     }),
     examples: {
       request: {
@@ -36,15 +37,19 @@ export class ApplicationTools {
           companyName: 'Atlassian',
           jobRole: 'Graduate Software Engineer',
           stage: 'Applied',
-          eligibilityStatus: 'Eligible'
+          eligibilityStatus: 'Needs verification'
         }
       }
     }
   })
   async addApplication(input: any, ctx: ExecutionContext) {
-    ctx.logger.info('Adding new application', { company: input.companyName, role: input.jobRole });
+    ctx.logger.info('Adding new application', {
+      company: input.companyName,
+      role: input.jobRole
+    });
 
     const todayStr = new Date().toISOString().split('T')[0];
+
     const newApplication = this.store.addApplication({
       companyName: input.companyName.trim(),
       jobRole: input.jobRole.trim(),
@@ -54,7 +59,8 @@ export class ApplicationTools {
       oaDate: input.oaDate,
       interviewDate: input.interviewDate,
       notes: input.notes,
-      eligibilityStatus: (input.eligibilityStatus as EligibilityStatus) || 'Eligible'
+      eligibilityStatus:
+        (input.eligibilityStatus as EligibilityStatus) || 'Needs verification'
     });
 
     return {
@@ -92,20 +98,26 @@ export class ApplicationTools {
   })
   @Widget('kanban-board')
   async listApplications(input: any, ctx: ExecutionContext) {
-    ctx.logger.info('Listing applications', { filterStage: input?.stage, filterCompany: input?.companyName });
-    
+    ctx.logger.info('Listing applications', {
+      filterStage: input?.stage,
+      filterCompany: input?.companyName
+    });
+
     let applications = this.store.getApplications();
 
     if (input?.stage) {
       applications = applications.filter(a => a.stage === input.stage);
     }
+
     if (input?.companyName) {
       const query = input.companyName.toLowerCase().trim();
-      applications = applications.filter(a => a.companyName.toLowerCase().includes(query));
+      applications = applications.filter(a =>
+        a.companyName.toLowerCase().includes(query)
+      );
     }
 
-    // Stage counts
     const allApps = this.store.getApplications();
+
     const stageCounts: Record<RecruitmentStage, number> = {
       Interested: 0,
       Applied: 0,
@@ -114,9 +126,10 @@ export class ApplicationTools {
       Offer: 0,
       Rejected: 0
     };
-    for (const a of allApps) {
-      if (stageCounts[a.stage] !== undefined) {
-        stageCounts[a.stage]++;
+
+    for (const application of allApps) {
+      if (stageCounts[application.stage] !== undefined) {
+        stageCounts[application.stage]++;
       }
     }
 
@@ -132,7 +145,7 @@ export class ApplicationTools {
     name: 'update_application_status',
     description: 'Update the recruitment stage and notes for an existing application with state transition validation',
     inputSchema: z.object({
-      id: z.string().min(1).describe('Application ID to update (e.g. "app-001")'),
+      id: z.string().min(1).describe('Application ID to update'),
       stage: z.enum(['Interested', 'Applied', 'OA', 'Interview', 'Offer', 'Rejected']).describe('Target recruitment stage'),
       notes: z.string().optional().describe('Additional notes or feedback for this stage update')
     }),
@@ -153,9 +166,13 @@ export class ApplicationTools {
     }
   })
   async updateApplicationStatus(input: any, ctx: ExecutionContext) {
-    ctx.logger.info('Updating application status', { id: input.id, stage: input.stage });
+    ctx.logger.info('Updating application status', {
+      id: input.id,
+      stage: input.stage
+    });
 
     const existing = this.store.getApplication(input.id);
+
     if (!existing) {
       return {
         status: 'error',
@@ -163,13 +180,21 @@ export class ApplicationTools {
       };
     }
 
-    // Validate stage transition
-    const transitionCheck = isValidStageTransition(existing.stage, input.stage as RecruitmentStage);
+    const transitionCheck = isValidStageTransition(
+      existing.stage,
+      input.stage as RecruitmentStage
+    );
+
     if (!transitionCheck.valid) {
       throw new Error(`Invalid stage transition: ${transitionCheck.reason}`);
     }
 
-    const updated = this.store.updateApplicationStatus(input.id, input.stage as RecruitmentStage, input.notes);
+    const updated = this.store.updateApplicationStatus(
+      input.id,
+      input.stage as RecruitmentStage,
+      input.notes
+    );
+
     return {
       status: 'success',
       message: `Successfully progressed ${existing.companyName} application from '${existing.stage}' to '${input.stage}'.`,
@@ -197,6 +222,7 @@ export class ApplicationTools {
     ctx.logger.info('Deleting application', { id: input.id });
 
     const existing = this.store.getApplication(input.id);
+
     if (!existing) {
       return {
         status: 'error',
@@ -205,6 +231,7 @@ export class ApplicationTools {
     }
 
     const deleted = this.store.deleteApplication(input.id);
+
     return {
       status: deleted ? 'success' : 'error',
       message: deleted

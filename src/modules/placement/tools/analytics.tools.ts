@@ -1,3 +1,4 @@
+
 import { ToolDecorator as Tool, Widget, ExecutionContext, z } from '@nitrostack/core';
 import { PlacementStore } from '../../../data/store.js';
 import { sortDeadlinesByUrgency } from '../../../utils/dateUtils.js';
@@ -26,7 +27,14 @@ export class AnalyticsTools {
         },
         applicationsFunnel: {
           total: 6,
-          byStage: { Interested: 1, Applied: 1, OA: 1, Interview: 1, Offer: 1, Rejected: 1 },
+          byStage: {
+            Interested: 1,
+            Applied: 1,
+            OA: 1,
+            Interview: 1,
+            Offer: 1,
+            Rejected: 1
+          },
           activePipelines: 3,
           offersCount: 1
         }
@@ -44,32 +52,60 @@ export class AnalyticsTools {
     const sortedDeadlines = sortDeadlinesByUrgency(rawDeadlines);
     const recentLogs = this.store.getPracticeLogs().slice(0, 3);
 
-    // Filter weak topics (confidence <= 2 or percentage < 45%)
+    // Weak topics: confidence <= 2 or progress < 45%
     const weakTopics = topics
-      .filter(t => t.confidence <= 2 || (t.targetProblems > 0 && (t.problemsSolved / t.targetProblems) < 0.45))
-      .map(t => ({
-        topic: t.topic,
-        category: t.category,
-        confidence: `${t.confidence}/5`,
-        progress: `${t.problemsSolved} / ${t.targetProblems} (${Math.round((t.problemsSolved / t.targetProblems) * 100)}%)`
-      }));
+      .filter(
+        t =>
+          t.confidence <= 2 ||
+          (t.targetProblems > 0 &&
+            t.problemsSolved / t.targetProblems < 0.45)
+      )
+      .map(t => {
+        const percentage =
+          t.targetProblems > 0
+            ? Math.round((t.problemsSolved / t.targetProblems) * 100)
+            : 0;
 
-    // Filter strong topics (confidence >= 4 and percentage >= 75%)
+        return {
+          topic: t.topic,
+          category: t.category,
+          confidence: `${t.confidence}/5`,
+          progress: `${t.problemsSolved} / ${t.targetProblems} (${percentage}%)`
+        };
+      });
+
+    // Strong topics: confidence >= 4 and progress >= 75%
     const strongTopics = topics
-      .filter(t => t.confidence >= 4 && (t.targetProblems > 0 && (t.problemsSolved / t.targetProblems) >= 0.75))
-      .map(t => ({
-        topic: t.topic,
-        category: t.category,
-        confidence: `${t.confidence}/5`,
-        progress: `${t.problemsSolved} / ${t.targetProblems} (100%)`
-      }));
+      .filter(
+        t =>
+          t.confidence >= 4 &&
+          t.targetProblems > 0 &&
+          t.problemsSolved / t.targetProblems >= 0.75
+      )
+      .map(t => {
+        const percentage =
+          Math.round((t.problemsSolved / t.targetProblems) * 100);
+
+        return {
+          topic: t.topic,
+          category: t.category,
+          confidence: `${t.confidence}/5`,
+          progress: `${t.problemsSolved} / ${t.targetProblems} (${percentage}%)`
+        };
+      });
 
     // Categorized deadlines
-    const critical24h = sortedDeadlines.filter(d => d.urgencyTier === 'WITHIN_24_HOURS');
-    const high3d = sortedDeadlines.filter(d => d.urgencyTier === 'WITHIN_3_DAYS');
+    const critical24h = sortedDeadlines.filter(
+      d => d.urgencyTier === 'WITHIN_24_HOURS'
+    );
+
+    const high3d = sortedDeadlines.filter(
+      d => d.urgencyTier === 'WITHIN_3_DAYS'
+    );
 
     // Qualitative readiness rating
     let readinessRating: string;
+
     if (metrics.overallReadinessPercentage >= 85) {
       readinessRating = 'Elite Tier (High Offer Probability)';
     } else if (metrics.overallReadinessPercentage >= 70) {
@@ -80,28 +116,41 @@ export class AnalyticsTools {
       readinessRating = 'Foundation Stage (Intensive Daily Study Required)';
     }
 
-    const activePipelines = 
-      metrics.applicationsByStage.Applied + 
-      metrics.applicationsByStage.OA + 
+    const activePipelines =
+      metrics.applicationsByStage.Applied +
+      metrics.applicationsByStage.OA +
       metrics.applicationsByStage.Interview;
 
     const recommendations: string[] = [];
+
     if (critical24h.length > 0) {
-      recommendations.push(`Complete urgent submission: ${critical24h.map(c => c.companyName).join(', ')} deadline within 24 hours.`);
+      recommendations.push(
+        `Complete urgent submission: ${critical24h.map(c => c.companyName).join(', ')} deadline within 24 hours.`
+      );
     }
+
     if (high3d.length > 0) {
-      recommendations.push(`Revise for upcoming interview: ${high3d.map(c => c.companyName).join(', ')} in next 3 days.`);
+      recommendations.push(
+        `Revise for upcoming interview: ${high3d.map(c => c.companyName).join(', ')} in next 3 days.`
+      );
     }
+
     if (weakTopics.length > 0) {
-      recommendations.push(`Prioritize study sessions for identified weak areas: ${weakTopics.map(w => w.topic).slice(0, 3).join(', ')}.`);
+      recommendations.push(
+        `Prioritize study sessions for identified weak areas: ${weakTopics.map(w => w.topic).slice(0, 3).join(', ')}.`
+      );
     }
+
     if (recommendations.length === 0) {
-      recommendations.push('Maintain daily problem solving consistency and schedule a full-length mock assessment.');
+      recommendations.push(
+        'Maintain daily problem solving consistency and schedule a full-length mock assessment.'
+      );
     }
 
     return {
       status: 'success',
       generatedAt: new Date().toISOString(),
+
       studentProfile: {
         name: profile.name,
         college: profile.college,
@@ -110,11 +159,13 @@ export class AnalyticsTools {
         graduationYear: profile.graduationYear,
         dailyAvailableHours: profile.dailyAvailableHours
       },
+
       overallReadiness: {
         scorePercentage: metrics.overallReadinessPercentage,
         rating: readinessRating,
         calculationFormula: 'Weighted: DSA (40%) + Core CS (30%) + SQL (15%) + Aptitude (15%)'
       },
+
       categoryBreakdowns: {
         dsa: {
           percentage: metrics.dsaProgressPercentage,
@@ -133,14 +184,17 @@ export class AnalyticsTools {
           weight: '15%'
         }
       },
+
       applicationsFunnel: {
         totalTracked: metrics.totalApplications,
         stageBreakdown: metrics.applicationsByStage,
         activeRecruitmentPipelines: activePipelines,
         offersSecured: metrics.applicationsByStage.Offer
       },
+
       recruitmentDeadlines: {
         totalUpcoming: sortedDeadlines.length,
+
         criticalWithin24Hours: critical24h.map(d => ({
           company: d.companyName,
           role: d.jobRole,
@@ -148,6 +202,7 @@ export class AnalyticsTools {
           due: d.formattedDueDate,
           urgency: d.urgencyLabel
         })),
+
         highPriorityWithin3Days: high3d.map(d => ({
           company: d.companyName,
           role: d.jobRole,
@@ -155,19 +210,24 @@ export class AnalyticsTools {
           due: d.formattedDueDate,
           urgency: d.urgencyLabel
         })),
-        nextImmediateEvent: sortedDeadlines.length > 0 ? {
-          company: sortedDeadlines[0].companyName,
-          type: sortedDeadlines[0].deadlineType,
-          due: sortedDeadlines[0].formattedDueDate,
-          urgency: sortedDeadlines[0].urgencyLabel
-        } : null
+
+        nextImmediateEvent: sortedDeadlines.length > 0
+          ? {
+              company: sortedDeadlines[0].companyName,
+              type: sortedDeadlines[0].deadlineType,
+              due: sortedDeadlines[0].formattedDueDate,
+              urgency: sortedDeadlines[0].urgencyLabel
+            }
+          : null
       },
+
       studyConsistencyAndPractice: {
         totalStudyHoursLogged: metrics.totalStudyHours,
         totalProblemsSolved: metrics.totalProblemsSolved,
         practiceStreakDays: metrics.studyConsistencyStreakDays,
         recentPracticeLogs: recentLogs
       },
+
       weakTopicsNeedingAttention: weakTopics,
       strongTopicsMastered: strongTopics,
       actionableRecommendations: recommendations
