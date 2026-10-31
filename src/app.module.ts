@@ -1,12 +1,13 @@
 import { McpApp, Module, ConfigModule } from '@nitrostack/core';
+import { PlacementModule } from './modules/placement/placement.module.js';
 import { CalculatorModule } from './modules/calculator/calculator.module.js';
 import { SystemHealthCheck } from './health/system.health.js';
 
 /**
  * Root Application Module
  * 
- * This is the main module that bootstraps the MCP server.
- * It registers all feature modules and health checks.
+ * Bootstraps Placement Copilot MCP server.
+ * Registers feature modules and health checks.
  */
 @McpApp({
   module: AppModule,
@@ -23,6 +24,7 @@ import { SystemHealthCheck } from './health/system.health.js';
   description: 'Root application module',
   imports: [
     ConfigModule.forRoot(),
+    PlacementModule,
     CalculatorModule
   ],
   providers: [
