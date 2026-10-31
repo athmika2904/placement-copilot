@@ -2,47 +2,144 @@
   "version": "1.0.0",
   "widgets": [
     {
-      "uri": "/calculator-result",
-      "name": "Calculator Result",
-      "description": "Displays the result of a calculation with operation details",
+      "uri": "/kanban-board",
+      "name": "Application Kanban Board",
+      "description": "Visual 6-stage recruitment board tracking applications across Interested, Applied, OA, Interview, Offer, and Rejected stages with one-click stage progression",
       "examples": [
         {
-          "name": "Addition Example",
-          "description": "Shows the result of adding 5 + 3",
+          "name": "Active Pipeline",
+          "description": "Recruitment pipeline with active student applications",
           "data": {
-            "operation": "add",
-            "a": 5,
-            "b": 3,
-            "result": 8,
-            "expression": "5 + 3 = 8"
-          }
-        },
-        {
-          "name": "Multiplication Example",
-          "description": "Shows the result of multiplying 6 × 7",
-          "data": {
-            "operation": "multiply",
-            "a": 6,
-            "b": 7,
-            "result": 42,
-            "expression": "6 × 7 = 42"
-          }
-        },
-        {
-          "name": "Division Example",
-          "description": "Shows the result of dividing 20 ÷ 4",
-          "data": {
-            "operation": "divide",
-            "a": 20,
-            "b": 4,
-            "result": 5,
-            "expression": "20 ÷ 4 = 5"
+            "status": "success",
+            "totalCount": 6,
+            "stageCounts": {
+              "Interested": 1,
+              "Applied": 1,
+              "OA": 1,
+              "Interview": 1,
+              "Offer": 1,
+              "Rejected": 1
+            },
+            "applications": [
+              {
+                "id": "app-001",
+                "companyName": "Microsoft",
+                "jobRole": "Software Engineer",
+                "stage": "Interested",
+                "applicationDeadline": "2026-11-01"
+              },
+              {
+                "id": "app-003",
+                "companyName": "Infosys",
+                "jobRole": "Specialist Programmer",
+                "stage": "OA",
+                "oaDate": "2026-11-21"
+              }
+            ]
           }
         }
       ],
-      "tags": ["calculator", "math", "result"]
+      "tags": ["placement", "recruitment", "kanban", "applications"]
+    },
+    {
+      "uri": "/deadline-timeline",
+      "name": "Deadline Timeline",
+      "description": "Chronological recruitment event stream with urgent within-24h and within-3-days indicators",
+      "examples": [
+        {
+          "name": "Upcoming Deadlines",
+          "description": "Sorted deadlines for applications, assessments, and interviews",
+          "data": {
+            "status": "success",
+            "summary": {
+              "within24Hours": 1,
+              "within3Days": 1,
+              "within7Days": 0,
+              "overdue": 0,
+              "total": 4
+            },
+            "deadlines": [
+              {
+                "id": "dl-001",
+                "companyName": "Microsoft",
+                "jobRole": "Software Engineer",
+                "deadlineType": "Application",
+                "dueDate": "2026-11-01T23:59:00",
+                "urgencyTier": "WITHIN_24_HOURS",
+                "urgencyLabel": "Due in 24 hours (Critical)",
+                "formattedDueDate": "Sun, Nov 1, 2026"
+              }
+            ]
+          }
+        }
+      ],
+      "tags": ["deadlines", "timeline", "interviews", "assessments"]
+    },
+    {
+      "uri": "/preparation-dashboard",
+      "name": "Preparation Dashboard",
+      "description": "Placement command center metrics: overall readiness index, category progress bars, funnel distribution, and weak topic alerts",
+      "examples": [
+        {
+          "name": "Student Readiness Overview",
+          "description": "Complete placement dashboard analytics",
+          "data": {
+            "status": "success",
+            "overallReadiness": {
+              "scorePercentage": 72,
+              "rating": "Strong Candidate (Competitive for Product Roles)",
+              "calculationFormula": "Weighted: DSA (40%) + Core CS (30%) + SQL (15%) + Aptitude (15%)"
+            },
+            "categoryBreakdowns": {
+              "dsa": { "percentage": 69, "weight": "40%" },
+              "coreCs": { "percentage": 74, "weight": "30%" },
+              "sql": { "percentage": 91, "weight": "15%" },
+              "aptitude": { "percentage": 80, "weight": "15%" }
+            }
+          }
+        }
+      ],
+      "tags": ["dashboard", "analytics", "readiness", "progress"]
+    },
+    {
+      "uri": "/weekly-planner",
+      "name": "Weekly Preparation Planner",
+      "description": "Day-by-day adaptive study sprint roadmap with interactive task completion and practice logging",
+      "examples": [
+        {
+          "name": "Infosys 21-Day Sprint",
+          "description": "Adaptive day-by-day preparation schedule targeting Specialist Programmer OA",
+          "data": {
+            "status": "success",
+            "targetCompany": "Infosys",
+            "recruitmentRound": "Online Assessment (OA)",
+            "totalDays": 21,
+            "dailyStudyHours": 3,
+            "totalStudyHoursPlanned": 63,
+            "schedule": [
+              {
+                "id": "task-1",
+                "dayNumber": 1,
+                "category": "DSA",
+                "topic": "Dynamic Programming",
+                "taskDescription": "1D Memoization vs Tabulation",
+                "allocatedHours": 3,
+                "isCompleted": false,
+                "type": "learning"
+              }
+            ]
+          }
+        }
+      ],
+      "tags": ["planner", "study-schedule", "roadmap", "dsa"]
+    },
+    {
+      "uri": "/calculator-result",
+      "name": "Calculator Result",
+      "description": "Displays the result of a calculation with operation details",
+      "examples": [],
+      "tags": ["calculator"]
     }
   ],
-  "generatedAt": "2025-01-01T00:00:00.000Z"
+  "generatedAt": "2026-10-31T00:00:00.000Z"
 }
-
