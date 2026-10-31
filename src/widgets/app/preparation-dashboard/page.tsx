@@ -4,100 +4,98 @@ import React from 'react';
 import { useTheme, useWidgetSDK } from '@nitrostack/widgets';
 
 interface DashboardOutput {
-  status: string;
-  studentProfile: {
-    name: string;
-    college: string;
-    branch: string;
-    cgpa: number;
-    graduationYear: number;
-    dailyAvailableHours: number;
+  status?: string;
+  studentProfile?: {
+    name?: string;
+    college?: string;
+    branch?: string;
+    cgpa?: number;
+    graduationYear?: number;
+    dailyAvailableHours?: number;
   };
-  overallReadiness: {
-    scorePercentage: number;
-    rating: string;
-    calculationFormula: string;
+  overallReadiness?: {
+    scorePercentage?: number;
+    rating?: string;
+    calculationFormula?: string;
   };
-  categoryBreakdowns: {
-    dsa: { percentage: number; weight: string };
-    coreCs: { percentage: number; weight: string };
-    sql: { percentage: number; weight: string };
-    aptitude: { percentage: number; weight: string };
+  categoryBreakdowns?: {
+    dsa?: { percentage?: number; weight?: string };
+    coreCs?: { percentage?: number; weight?: string };
+    sql?: { percentage?: number; weight?: string };
+    aptitude?: { percentage?: number; weight?: string };
   };
-  applicationsFunnel: {
-    totalTracked: number;
-    stageBreakdown: Record<string, number>;
-    activeRecruitmentPipelines: number;
-    offersSecured: number;
+  applicationsFunnel?: {
+    totalTracked?: number;
+    stageBreakdown?: Record<string, number>;
+    activeRecruitmentPipelines?: number;
+    offersSecured?: number;
   };
-  studyConsistencyAndPractice: {
-    totalStudyHoursLogged: number;
-    totalProblemsSolved: number;
-    practiceStreakDays: number;
-    recentPracticeLogs: Array<{ topic: string; category: string; problemsSolved: number; studyHours: number; date: string }>;
+  studyConsistencyAndPractice?: {
+    totalStudyHoursLogged?: number;
+    totalProblemsSolved?: number;
+    practiceStreakDays?: number;
+    recentPracticeLogs?: Array<{ topic: string; category: string; problemsSolved: number; studyHours: number; date: string }>;
   };
-  weakTopicsNeedingAttention: Array<{ topic: string; category: string; confidence: string; progress: string }>;
-  strongTopicsMastered: Array<{ topic: string; category: string; confidence: string; progress: string }>;
-  actionableRecommendations: string[];
+  weakTopicsNeedingAttention?: Array<{ topic: string; category: string; confidence: string; progress: string }>;
+  strongTopicsMastered?: Array<{ topic: string; category: string; confidence: string; progress: string }>;
+  actionableRecommendations?: string[];
 }
 
 export default function PreparationDashboardWidget() {
   const theme = useTheme();
   const { getToolOutput } = useWidgetSDK();
-  const rawData = getToolOutput<DashboardOutput>();
+  const raw = getToolOutput<any>();
 
-  const data: DashboardOutput = rawData || {
-    status: 'success',
-    studentProfile: {
-      name: 'Rahul Sharma',
-      college: 'National Institute of Technology',
-      branch: 'Computer Science and Engineering',
-      cgpa: 8.42,
-      graduationYear: 2026,
-      dailyAvailableHours: 3
-    },
-    overallReadiness: {
-      scorePercentage: 72,
-      rating: 'Strong Candidate (Competitive for Product Roles)',
-      calculationFormula: 'Weighted: DSA (40%) + Core CS (30%) + SQL (15%) + Aptitude (15%)'
-    },
-    categoryBreakdowns: {
-      dsa: { percentage: 69, weight: '40%' },
-      coreCs: { percentage: 74, weight: '30%' },
-      sql: { percentage: 91, weight: '15%' },
-      aptitude: { percentage: 80, weight: '15%' }
-    },
-    applicationsFunnel: {
-      totalTracked: 6,
-      stageBreakdown: { Interested: 1, Applied: 1, OA: 1, Interview: 1, Offer: 1, Rejected: 1 },
-      activeRecruitmentPipelines: 3,
-      offersSecured: 1
-    },
-    studyConsistencyAndPractice: {
-      totalStudyHoursLogged: 7.5,
-      totalProblemsSolved: 179,
-      practiceStreakDays: 3,
-      recentPracticeLogs: [
-        { topic: 'Dynamic Programming', category: 'DSA', problemsSolved: 3, studyHours: 3, date: '2026-10-30' },
-        { topic: 'DBMS & SQL Queries', category: 'DBMS', problemsSolved: 6, studyHours: 2, date: '2026-10-29' }
-      ]
-    },
-    weakTopicsNeedingAttention: [
-      { topic: 'Dynamic Programming', category: 'DSA', confidence: '2/5', progress: '16 / 50 (32%)' },
-      { topic: 'Graph Algorithms', category: 'DSA', confidence: '2/5', progress: '12 / 45 (27%)' },
-      { topic: 'Operating Systems (Concurrency)', category: 'OS', confidence: '2/5', progress: '14 / 30 (47%)' }
-    ],
-    strongTopicsMastered: [
-      { topic: 'Arrays & Strings', category: 'DSA', confidence: '5/5', progress: '45 / 45 (100%)' },
-      { topic: 'DBMS & SQL Queries', category: 'DBMS', confidence: '4/5', progress: '32 / 35 (91%)' },
-      { topic: 'OOP & Design Patterns', category: 'OOP', confidence: '4/5', progress: '24 / 25 (96%)' }
-    ],
-    actionableRecommendations: [
-      'Focus next 2 study sessions on Dynamic Programming and Graph BFS/DFS.',
-      'Submit Microsoft application before 24-hour portal close deadline.',
-      'Revise Amazon Leadership Principles ahead of Technical Round 1.'
-    ]
+  // Deep safe resolution
+  const profile = {
+    name: raw?.studentProfile?.name || 'Rahul Sharma',
+    college: raw?.studentProfile?.college || 'National Institute of Technology',
+    branch: raw?.studentProfile?.branch || 'Computer Science and Engineering',
+    cgpa: raw?.studentProfile?.cgpa ?? 8.42,
+    graduationYear: raw?.studentProfile?.graduationYear || 2026,
+    dailyAvailableHours: raw?.studentProfile?.dailyAvailableHours || 3
   };
+
+  const readiness = {
+    scorePercentage: raw?.overallReadiness?.scorePercentage ?? 72,
+    rating: raw?.overallReadiness?.rating || 'Strong Candidate (Competitive for Product Roles)',
+    formula: raw?.overallReadiness?.calculationFormula || 'Weighted: DSA (40%) + Core CS (30%) + SQL (15%) + Aptitude (15%)'
+  };
+
+  const categories = {
+    dsa: raw?.categoryBreakdowns?.dsa?.percentage ?? 69,
+    coreCs: raw?.categoryBreakdowns?.coreCs?.percentage ?? 74,
+    sql: raw?.categoryBreakdowns?.sql?.percentage ?? 91,
+    aptitude: raw?.categoryBreakdowns?.aptitude?.percentage ?? 80
+  };
+
+  const funnel = {
+    total: raw?.applicationsFunnel?.totalTracked ?? 6,
+    active: raw?.applicationsFunnel?.activeRecruitmentPipelines ?? 3,
+    offers: raw?.applicationsFunnel?.offersSecured ?? 1
+  };
+
+  const consistency = {
+    hours: raw?.studyConsistencyAndPractice?.totalStudyHoursLogged ?? 7.5,
+    problems: raw?.studyConsistencyAndPractice?.totalProblemsSolved ?? 179,
+    streak: raw?.studyConsistencyAndPractice?.practiceStreakDays ?? 3
+  };
+
+  const weakTopics = Array.isArray(raw?.weakTopicsNeedingAttention) && raw.weakTopicsNeedingAttention.length > 0
+    ? raw.weakTopicsNeedingAttention
+    : [
+        { topic: 'Dynamic Programming', category: 'DSA', confidence: '2/5', progress: '16 / 50 (32%)' },
+        { topic: 'Graph Algorithms', category: 'DSA', confidence: '2/5', progress: '12 / 45 (27%)' },
+        { topic: 'Operating Systems (Concurrency)', category: 'OS', confidence: '2/5', progress: '14 / 30 (47%)' }
+      ];
+
+  const recommendations = Array.isArray(raw?.actionableRecommendations) && raw.actionableRecommendations.length > 0
+    ? raw.actionableRecommendations
+    : [
+        'Focus next 2 study sessions on Dynamic Programming and Graph BFS/DFS.',
+        'Submit Microsoft application before 24-hour portal close deadline.',
+        'Revise Amazon Leadership Principles ahead of Technical Round 1.'
+      ];
 
   const isDark = theme === 'dark';
 
@@ -148,7 +146,7 @@ export default function PreparationDashboardWidget() {
             Placement Command Center
           </h1>
           <div style={{ fontSize: '12.5px', color: p.textMuted, marginTop: '2px' }}>
-            {data.studentProfile.name} • {data.studentProfile.branch} (CGPA {data.studentProfile.cgpa.toFixed(2)})
+            {profile.name} • {profile.branch} (CGPA {profile.cgpa.toFixed(2)})
           </div>
         </div>
 
@@ -164,7 +162,7 @@ export default function PreparationDashboardWidget() {
             Overall Readiness
           </div>
           <div style={{ fontSize: '24px', fontWeight: 700, color: p.textPrimary, letterSpacing: '-0.5px' }}>
-            {data.overallReadiness.scorePercentage}%
+            {readiness.scorePercentage}%
           </div>
         </div>
       </div>
@@ -177,10 +175,10 @@ export default function PreparationDashboardWidget() {
         marginBottom: '20px'
       }}>
         {[
-          { label: 'Problems Solved', value: data.studyConsistencyAndPractice.totalProblemsSolved, sub: 'Across all topics' },
-          { label: 'Hours Dedicated', value: `${data.studyConsistencyAndPractice.totalStudyHoursLogged}h`, sub: 'Logged practice time' },
-          { label: 'Active Pipelines', value: data.applicationsFunnel.activeRecruitmentPipelines, sub: 'Applied • OA • Interview' },
-          { label: 'Offers Secured', value: data.applicationsFunnel.offersSecured, sub: '1 offer in hand' }
+          { label: 'Problems Solved', value: consistency.problems, sub: 'Across all topics' },
+          { label: 'Hours Dedicated', value: `${consistency.hours}h`, sub: 'Logged practice time' },
+          { label: 'Active Pipelines', value: funnel.active, sub: 'Applied • OA • Interview' },
+          { label: 'Offers Secured', value: funnel.offers, sub: `${funnel.offers} offer in hand` }
         ].map((tile, i) => (
           <div
             key={i}
@@ -224,10 +222,10 @@ export default function PreparationDashboardWidget() {
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
             {[
-              { label: 'Data Structures & Algorithms', pct: data.categoryBreakdowns.dsa.percentage, weight: '40% weight' },
-              { label: 'Core Computer Science (DBMS, OS, OOP)', pct: data.categoryBreakdowns.coreCs.percentage, weight: '30% weight' },
-              { label: 'SQL & Query Optimization', pct: data.categoryBreakdowns.sql.percentage, weight: '15% weight' },
-              { label: 'Quantitative & Analytical Aptitude', pct: data.categoryBreakdowns.aptitude.percentage, weight: '15% weight' }
+              { label: 'Data Structures & Algorithms', pct: categories.dsa, weight: '40% weight' },
+              { label: 'Core Computer Science (DBMS, OS, OOP)', pct: categories.coreCs, weight: '30% weight' },
+              { label: 'SQL & Query Optimization', pct: categories.sql, weight: '15% weight' },
+              { label: 'Quantitative & Analytical Aptitude', pct: categories.aptitude, weight: '15% weight' }
             ].map((cat, i) => (
               <div key={i}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '12px', marginBottom: '5px' }}>
@@ -259,7 +257,7 @@ export default function PreparationDashboardWidget() {
             paddingTop: '10px',
             borderTop: `1px dashed ${p.border}`
           }}>
-            {data.overallReadiness.calculationFormula}
+            {readiness.formula}
           </div>
         </div>
 
@@ -275,7 +273,7 @@ export default function PreparationDashboardWidget() {
           </div>
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-            {data.weakTopicsNeedingAttention.map((t, idx) => (
+            {weakTopics.map((t, idx) => (
               <div
                 key={idx}
                 style={{
@@ -333,7 +331,7 @@ export default function PreparationDashboardWidget() {
           Recommended Next Steps
         </div>
         <ul style={{ margin: 0, paddingLeft: '18px', fontSize: '12.5px', color: p.textPrimary, lineHeight: 1.6 }}>
-          {data.actionableRecommendations.map((rec, i) => (
+          {recommendations.map((rec, i) => (
             <li key={i}>{rec}</li>
           ))}
         </ul>

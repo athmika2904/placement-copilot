@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { useTheme, useWidgetSDK } from '@nitrostack/widgets';
 
 interface StudyTask {
@@ -16,50 +16,51 @@ interface StudyTask {
 }
 
 interface PlanOutput {
-  status: string;
-  planId: string;
-  targetCompany: string;
-  recruitmentRound: string;
-  totalDays: number;
-  dailyStudyHours: number;
-  totalStudyHoursPlanned: number;
-  schedule: StudyTask[];
-  summary: string;
+  status?: string;
+  planId?: string;
+  targetCompany?: string;
+  recruitmentRound?: string;
+  totalDays?: number;
+  dailyStudyHours?: number;
+  totalStudyHoursPlanned?: number;
+  schedule?: StudyTask[];
+  summary?: string;
 }
+
+const DEFAULT_SCHEDULE: StudyTask[] = [
+  { id: 'task-1', dayNumber: 1, date: '2026-11-01', category: 'DSA', topic: 'Dynamic Programming', taskDescription: 'Understand 1D Memoization vs Tabulation. Solve Climbing Stairs & House Robber.', allocatedHours: 3, isCompleted: true, type: 'learning' },
+  { id: 'task-2', dayNumber: 2, date: '2026-11-02', category: 'DSA', topic: 'Dynamic Programming', taskDescription: '0/1 Knapsack patterns. Solve Coin Change I & II, Subset Sum.', allocatedHours: 3, isCompleted: true, type: 'practice' },
+  { id: 'task-3', dayNumber: 3, date: '2026-11-03', category: 'DSA', topic: 'Graph Algorithms', taskDescription: 'Graph representation, BFS, DFS, and cycle detection in directed graphs.', allocatedHours: 3, isCompleted: false, type: 'learning' },
+  { id: 'task-4', dayNumber: 4, date: '2026-11-04', category: 'DSA', topic: 'Graph Algorithms', taskDescription: 'Dijkstra shortest path algorithm & Topological Sort (Kahn\'s algorithm).', allocatedHours: 3, isCompleted: false, type: 'practice' },
+  { id: 'task-5', dayNumber: 5, date: '2026-11-05', category: 'DSA', topic: 'Trees & BST', taskDescription: 'Lowest Common Ancestor, Tree diameters, and BST validation.', allocatedHours: 3, isCompleted: false, type: 'practice' },
+  { id: 'task-6', dayNumber: 6, date: '2026-11-06', category: 'DBMS', topic: 'DBMS & SQL Queries', taskDescription: 'Practice complex SQL joins and window functions (RANK, DENSE_RANK).', allocatedHours: 3, isCompleted: false, type: 'practice' },
+  { id: 'task-7', dayNumber: 7, date: '2026-11-07', category: 'Technical Interviews', topic: 'Infosys Specialist Mock OA', taskDescription: 'Timed 3-hour mock coding contest (3 questions) replicating HackerEarth exam.', allocatedHours: 3, isCompleted: false, type: 'mock_test' }
+];
 
 export default function WeeklyPlannerWidget() {
   const theme = useTheme();
   const { getToolOutput, callTool } = useWidgetSDK();
-  const rawData = getToolOutput<PlanOutput>();
+  const rawData = getToolOutput<any>();
 
-  const initialPlan: PlanOutput = rawData || {
-    status: 'success',
-    planId: 'plan-default',
-    targetCompany: 'Infosys',
-    recruitmentRound: 'Online Assessment (OA)',
-    totalDays: 21,
-    dailyStudyHours: 3,
-    totalStudyHoursPlanned: 63,
-    summary: '21-day adaptive preparation roadmap targeting Infosys Specialist Programmer OA. Top priority given to weak areas: Dynamic Programming and Graph Algorithms.',
-    schedule: [
-      { id: 'task-1', dayNumber: 1, date: '2026-11-01', category: 'DSA', topic: 'Dynamic Programming', taskDescription: 'Understand 1D Memoization vs Tabulation. Solve Climbing Stairs & House Robber.', allocatedHours: 3, isCompleted: true, type: 'learning' },
-      { id: 'task-2', dayNumber: 2, date: '2026-11-02', category: 'DSA', topic: 'Dynamic Programming', taskDescription: '0/1 Knapsack patterns. Solve Coin Change I & II, Subset Sum.', allocatedHours: 3, isCompleted: true, type: 'practice' },
-      { id: 'task-3', dayNumber: 3, date: '2026-11-03', category: 'DSA', topic: 'Graph Algorithms', taskDescription: 'Graph representation, BFS, DFS, and cycle detection in directed graphs.', allocatedHours: 3, isCompleted: false, type: 'learning' },
-      { id: 'task-4', dayNumber: 4, date: '2026-11-04', category: 'DSA', topic: 'Graph Algorithms', taskDescription: 'Dijkstra shortest path algorithm & Topological Sort (Kahn\'s algorithm).', allocatedHours: 3, isCompleted: false, type: 'practice' },
-      { id: 'task-5', dayNumber: 5, date: '2026-11-05', category: 'DSA', topic: 'Trees & BST', taskDescription: 'Lowest Common Ancestor, Tree diameters, and BST validation.', allocatedHours: 3, isCompleted: false, type: 'practice' },
-      { id: 'task-6', dayNumber: 6, date: '2026-11-06', category: 'DBMS', topic: 'DBMS & SQL Queries', taskDescription: 'Practice complex SQL joins and window functions (RANK, DENSE_RANK).', allocatedHours: 3, isCompleted: false, type: 'practice' },
-      { id: 'task-7', dayNumber: 7, date: '2026-11-07', category: 'Technical Interviews', topic: 'Infosys Specialist Mock OA', taskDescription: 'Timed 3-hour mock coding contest (3 questions) replicating HackerEarth exam.', allocatedHours: 3, isCompleted: false, type: 'mock_test' }
-    ]
-  };
-
-  const [completedTasks, setCompletedTasks] = useState<Record<string, boolean>>(() => {
-    const map: Record<string, boolean> = {};
-    for (const t of initialPlan.schedule) {
-      if (t.isCompleted) map[t.id] = true;
+  // Defensively extract schedule array
+  const schedule: StudyTask[] = useMemo(() => {
+    if (rawData && Array.isArray(rawData.schedule) && rawData.schedule.length > 0) {
+      return rawData.schedule;
     }
-    return map;
-  });
+    if (rawData?.plan && Array.isArray(rawData.plan.schedule) && rawData.plan.schedule.length > 0) {
+      return rawData.plan.schedule;
+    }
+    return DEFAULT_SCHEDULE;
+  }, [rawData]);
 
+  const targetCompany = rawData?.targetCompany || rawData?.plan?.targetCompany || 'Infosys';
+  const recruitmentRound = rawData?.recruitmentRound || rawData?.plan?.recruitmentRound || 'Online Assessment (OA)';
+  const totalDays = rawData?.totalDays || rawData?.plan?.totalDays || schedule.length || 21;
+  const dailyStudyHours = rawData?.dailyStudyHours || rawData?.plan?.dailyStudyHours || 3;
+  const totalStudyHoursPlanned = rawData?.totalStudyHoursPlanned || (totalDays * dailyStudyHours);
+  const summary = rawData?.summary || rawData?.plan?.summary || `21-day adaptive preparation roadmap targeting ${targetCompany} (${recruitmentRound}). Top priority given to weak areas: Dynamic Programming and Graph Algorithms.`;
+
+  const [completedTasks, setCompletedTasks] = useState<Record<string, boolean>>({});
   const [activeTab, setActiveTab] = useState<'all' | 'pending' | 'completed'>('all');
 
   const isDark = theme === 'dark';
@@ -81,7 +82,6 @@ export default function WeeklyPlannerWidget() {
 
     if (nextState) {
       try {
-        // Log practice progress to NitroStack backend
         await callTool('log_practice', {
           topic: task.topic,
           category: task.category,
@@ -95,12 +95,12 @@ export default function WeeklyPlannerWidget() {
     }
   };
 
-  const totalTasks = initialPlan.schedule.length;
+  const totalTasks = schedule.length;
   const doneCount = Object.values(completedTasks).filter(Boolean).length;
   const progressPct = totalTasks > 0 ? Math.round((doneCount / totalTasks) * 100) : 0;
 
-  const visibleTasks = initialPlan.schedule.filter(t => {
-    const isDone = !!completedTasks[t.id];
+  const visibleTasks = schedule.filter(t => {
+    const isDone = !!completedTasks[t.id] || (t.isCompleted && completedTasks[t.id] === undefined);
     if (activeTab === 'pending') return !isDone;
     if (activeTab === 'completed') return isDone;
     return true;
@@ -137,10 +137,10 @@ export default function WeeklyPlannerWidget() {
             letterSpacing: '-0.4px',
             color: p.textPrimary
           }}>
-            {initialPlan.targetCompany} • {initialPlan.recruitmentRound}
+            {targetCompany} • {recruitmentRound}
           </h1>
           <div style={{ fontSize: '12.5px', color: p.textMuted, marginTop: '2px' }}>
-            {initialPlan.totalDays}-Day Sprint • {initialPlan.dailyStudyHours} hours/day ({initialPlan.totalStudyHoursPlanned} total study hours)
+            {totalDays}-Day Sprint • {dailyStudyHours} hours/day ({totalStudyHoursPlanned} total study hours)
           </div>
         </div>
 
@@ -172,7 +172,7 @@ export default function WeeklyPlannerWidget() {
         lineHeight: 1.45,
         marginBottom: '18px'
       }}>
-        {initialPlan.summary}
+        {summary}
       </div>
 
       {/* Tabs */}
@@ -185,7 +185,7 @@ export default function WeeklyPlannerWidget() {
         <div style={{ display: 'flex', gap: '6px' }}>
           {[
             { id: 'all', label: `All Tasks (${totalTasks})` },
-            { id: 'pending', label: `Pending (${totalTasks - doneCount})` },
+            { id: 'pending', label: `Pending (${Math.max(0, totalTasks - doneCount)})` },
             { id: 'completed', label: `Completed (${doneCount})` }
           ].map(tab => (
             <button
@@ -212,7 +212,7 @@ export default function WeeklyPlannerWidget() {
       {/* Daily Task List */}
       <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
         {visibleTasks.map((task) => {
-          const isDone = !!completedTasks[task.id];
+          const isDone = !!completedTasks[task.id] || (task.isCompleted && completedTasks[task.id] === undefined);
 
           return (
             <div
